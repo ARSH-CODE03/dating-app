@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aura — Discover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>
+.app-shell{display:grid;grid-template-columns:260px 1fr;grid-template-rows:100vh;overflow:hidden;}
+@media(max-width:768px){.app-shell{grid-template-columns:1fr;}}
+
+/* SIDEBAR */
+.sidebar{
+  background:#0C0819;border-right:1px solid rgba(255,255,255,0.06);
+  display:flex;flex-direction:column;padding:1.5rem;
+  overflow-y:auto;
+}
+@media(max-width:768px){.sidebar{display:none;}}
+
+.sidebar-logo{
+  font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:2rem;padding:0.5rem 0;
+}
+
+.user-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:1.2rem;display:flex;align-items:center;gap:0.8rem;
+  margin-bottom:1.5rem;
+}
+.user-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;
+}
+.user-name{font-weight:600;font-size:0.95rem;color:#fff;}
+.user-status{font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:0.1rem;}
+
+.nav-menu{display:flex;flex-direction:column;gap:0.4rem;flex:1;}
+.nav-item{
+  display:flex;align-items:center;gap:0.8rem;padding:0.8rem 1rem;
+  border-radius:12px;color:rgba(255,255,255,0.5);cursor:pointer;
+  transition:all .2s;font-size:0.9rem;
+  border:none;background:transparent;width:100%;text-align:left;
+}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:#fff;}
+.nav-item.active{background:rgba(255,77,109,0.12);color:#FF8FA3;}
+.nav-icon{font-size:1.1rem;width:22px;text-align:center;}
+.nav-badge{
+  margin-left:auto;background:#FF4D6D;color:#fff;
+  font-size:0.7rem;font-weight:700;padding:0.15rem 0.5rem;
+  border-radius:50px;min-width:20px;text-align:center;
+}
+
+.sidebar-footer{margin-top:auto;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06);}
+.logout-btn{
+  width:100%;padding:0.7rem;border-radius:10px;
+  background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.2);
+  color:#FF8FA3;font-size:0.88rem;cursor:pointer;transition:all .2s;
+}
+.logout-btn:hover{background:rgba(255,77,109,0.15);}
+
+/* MAIN CONTENT */
+.main{overflow-y:auto;background:var(--bg);}
+
+/* Mobile nav bar */
+.mobile-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(8,5,18,0.95);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,0.08);
+  display:none;justify-content:space-around;padding:0.8rem 0 0.5rem;
+}
+@media(max-width:768px){.mobile-nav{display:flex;}.main{padding-bottom:80px;}}
+.mob-btn{
+  background:none;border:none;color:rgba(255,255,255,0.4);
+  font-size:1.4rem;cursor:pointer;padding:0.3rem 0.8rem;
+  border-radius:10px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:0.2rem;
+}
+.mob-btn.active{color:#FF4D6D;}
+.mob-label{font-size:0.6rem;font-family:'DM Sans',sans-serif;}
+
+/* VIEWS */
+.view{display:none;padding:2rem;}
+.view.active{display:block;}
+
+/* Discover */
+.discover-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.view-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:#fff;}
+.filter-btn{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);padding:0.55rem 1.1rem;border-radius:50px;
+  font-size:0.85rem;cursor:pointer;transition:all .2s;
+}
+.filter-btn:hover{background:rgba(255,255,255,0.1);color:#fff;}
+
+/* Card stack */
+.card-stack{
+  position:relative;width:100%;max-width:420px;height:560px;margin:0 auto;
+}
+.profile-card{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(20,10,40,0.3) 0%,rgba(8,5,18,0.98) 100%),
+             var(--card-bg, linear-gradient(135deg,#2d0a4e,#1a0530));
+  border:1px solid rgba(255,255,255,0.1);border-radius:28px;
+  overflow:hidden;cursor:grab;
+  transition:transform .15s;
+  user-select:none;
+}
+.profile-card:active{cursor:grabbing;}
+.profile-card.dragging{transition:none;}
+.profile-card.swipe-left{
+  animation:swipeLeft .4s ease forwards;
+}
+.profile-card.swipe-right{
+  animation:swipeRight .4s ease forwards;
+}
+@keyframes swipeLeft{to{transform:translateX(-140%) rotate(-30deg);opacity:0;}}
+@keyframes swipeRight{to{transform:translateX(140%) rotate(30deg);opacity:0;}}
+
+/* Like/Nope overlays */
+.card-like-overlay,.card-nope-overlay{
+  position:absolute;top:2rem;padding:0.4rem 1.2rem;
+  border-radius:8px;font-size:1.3rem;font-weight:900;
+  letter-spacing:0.05em;opacity:0;transition:opacity .2s;z-index:5;
+  border:3px solid;
+}
+.card-like-overlay{left:1.5rem;color:#00C896;border-color:#00C896;transform:rotate(-20deg);}
+.card-nope-overlay{right:1.5rem;color:#FF4D6D;border-color:#FF4D6D;transform:rotate(20deg);}
+
+.card-bg{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:8rem;
+  background:var(--card-bg, linear-gradient(135deg,#2d0a4e,#1a0530));
+}
+.card-info{
+  position:absolute;bottom:0;left:0;right:0;padding:1.5rem 1.8rem 2rem;
+  background:linear-gradient(0deg,rgba(8,5,18,1) 0%,rgba(8,5,18,0.8) 60%,transparent 100%);
+}
+.card-name-age{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:#fff;}
+.card-location{font-size:0.85rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;}
+.card-bio{font-size:0.88rem;color:rgba(255,255,255,0.65);margin:0.7rem 0;line-height:1.5;}
+.card-interests{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.card-tag{
+  padding:0.3rem 0.7rem;border-radius:50px;font-size:0.75rem;
+  background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);
+}
+.card-match-score{
+  position:absolute;top:1.2rem;right:1.2rem;
+  background:rgba(8,5,18,0.7);backdrop-filter:blur(10px);
+  border-radius:50px;padding:0.4rem 0.9rem;
+  font-size:0.8rem;font-weight:700;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+/* Action buttons */
+.action-btns{
+  display:flex;align-items:center;justify-content:center;
+  gap:1.2rem;margin-top:2rem;
+}
+.action-btn{
+  border:none;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,box-shadow .2s;font-size:1.3rem;
+}
+.action-btn.nope{
+  width:56px;height:56px;
+  background:rgba(255,77,109,0.12);border:2px solid rgba(255,77,109,0.3);
+  color:#FF4D6D;
+}
+.action-btn.super{
+  width:48px;height:48px;
+  background:rgba(255,211,61,0.1);border:2px solid rgba(255,211,61,0.3);
+  color:#FFD93D;
+}
+.action-btn.like{
+  width:64px;height:64px;
+  background:rgba(0,200,150,0.12);border:2px solid rgba(0,200,150,0.3);
+  color:#00C896;
+}
+.action-btn:hover{transform:scale(1.12);}
+.action-btn.like:hover{box-shadow:0 8px 30px rgba(0,200,150,0.3);}
+.action-btn.nope:hover{box-shadow:0 8px 30px rgba(255,77,109,0.3);}
+
+/* No more cards */
+.no-cards{
+  display:none;text-align:center;padding:3rem 2rem;
+}
+.no-cards-icon{font-size:4rem;margin-bottom:1rem;}
+.no-cards-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;margin-bottom:0.5rem;}
+.no-cards-sub{color:var(--text-muted);font-size:0.9rem;}
+
+/* MATCHES VIEW */
+.matches-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.2rem;
+}
+.match-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:1.5rem;text-align:center;cursor:pointer;
+  transition:all .2s;
+}
+.match-card:hover{border-color:rgba(255,77,109,0.3);transform:translateY(-4px);}
+.match-avatar{
+  width:70px;height:70px;border-radius:50%;
+  margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;
+  font-size:2rem;border:2px solid rgba(255,77,109,0.3);
+  background:linear-gradient(135deg,rgba(255,77,109,0.1),rgba(199,125,255,0.1));
+}
+.match-name{font-weight:600;color:#fff;font-size:0.95rem;}
+.match-meta{font-size:0.78rem;color:var(--text-muted);margin-top:0.25rem;}
+.match-score{
+  margin-top:0.7rem;font-size:0.82rem;font-weight:700;
+  background:linear-gradient(90deg,#FF4D6D,#C77DFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.chat-btn{
+  margin-top:0.8rem;width:100%;padding:0.5rem;border-radius:50px;
+  background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);
+  color:#FF8FA3;font-size:0.82rem;cursor:pointer;transition:all .2s;
+}
+.chat-btn:hover{background:rgba(255,77,109,0.2);}
+
+/* CHAT VIEW */
+.chat-layout{display:grid;grid-template-columns:280px 1fr;gap:0;height:calc(100vh - 4rem);}
+@media(max-width:900px){.chat-layout{grid-template-columns:1fr;}}
+.chat-list{border-right:1px solid rgba(255,255,255,0.06);overflow-y:auto;}
+.chat-list-header{padding:1.2rem 1.5rem;font-weight:600;font-size:0.95rem;color:#fff;border-bottom:1px solid rgba(255,255,255,0.06);}
+.chat-item{
+  display:flex;align-items:center;gap:0.8rem;padding:1rem 1.5rem;
+  cursor:pointer;transition:background .2s;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.chat-item:hover,.chat-item.active{background:rgba(255,255,255,0.04);}
+.chat-item-avatar{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+  background:linear-gradient(135deg,rgba(255,77,109,0.15),rgba(199,125,255,0.15));
+}
+.chat-item-name{font-size:0.9rem;font-weight:600;color:#fff;}
+.chat-item-preview{font-size:0.78rem;color:var(--text-muted);margin-top:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+.online-dot{width:10px;height:10px;background:#00C896;border-radius:50%;border:2px solid #0C0819;margin-left:auto;flex-shrink:0;}
+
+.chat-window{display:flex;flex-direction:column;}
+.chat-window-header{
+  display:flex;align-items:center;gap:1rem;padding:1.2rem 1.5rem;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.chat-window-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:linear-gradient(135deg,rgba(255,77,109,0.15),rgba(199,125,255,0.15));}
+.chat-window-name{font-weight:600;color:#fff;}
+.chat-window-status{font-size:0.78rem;color:#00C896;}
+.messages{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:0.8rem;}
+.msg{max-width:70%;padding:0.8rem 1.1rem;border-radius:18px;font-size:0.9rem;line-height:1.5;animation:msgIn .2s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.msg.them{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);border-bottom-left-radius:4px;align-self:flex-start;}
+.msg.me{background:linear-gradient(135deg,#FF4D6D,#C77DFF);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+.msg-time{font-size:0.68rem;color:var(--text-dim);margin-top:0.2rem;}
+.msg-wrap.me{display:flex;flex-direction:column;align-items:flex-end;}
+.msg-wrap.them{display:flex;flex-direction:column;align-items:flex-start;}
+
+.chat-input-row{
+  display:flex;align-items:center;gap:0.8rem;padding:1rem 1.5rem;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+.chat-input{
+  flex:1;padding:0.8rem 1.2rem;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:50px;color:#fff;font-size:0.92rem;outline:none;transition:border-color .2s;
+}
+.chat-input:focus{border-color:#FF4D6D;}
+.chat-input::placeholder{color:rgba(255,255,255,0.2);}
+.send-btn{
+  width:44px;height:44px;border:none;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  color:#fff;font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,opacity .2s;
+}
+.send-btn:hover{transform:scale(1.1);}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+.chat-placeholder{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--text-muted);text-align:center;padding:2rem;
+}
+.chat-placeholder-icon{font-size:3rem;margin-bottom:1rem;}
+
+/* PROFILE VIEW */
+.profile-view{max-width:600px;}
+.profile-hero{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:24px;padding:2.5rem;display:flex;align-items:flex-start;gap:2rem;
+  margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.profile-big-avatar{
+  width:90px;height:90px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:2.8rem;
+  background:linear-gradient(135deg,rgba(255,77,109,0.2),rgba(199,125,255,0.2));
+  border:3px solid rgba(255,77,109,0.3);
+}
+.profile-name{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:#fff;}
+.profile-meta{color:var(--text-muted);margin-top:0.3rem;font-size:0.9rem;}
+.profile-bio{color:rgba(255,255,255,0.7);margin-top:0.8rem;line-height:1.6;font-size:0.9rem;}
+.edit-profile-btn{
+  margin-top:1rem;padding:0.6rem 1.4rem;border-radius:50px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer;transition:all .2s;
+}
+.edit-profile-btn:hover{background:rgba(255,255,255,0.1);color:#fff;}
+
+.profile-section{
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+  border-radius:18px;padding:1.5rem;margin-bottom:1rem;
+}
+.ps-title{font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1rem;}
+.interest-pills{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.i-pill{
+  padding:0.4rem 0.9rem;border-radius:50px;font-size:0.82rem;
+  background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);color:#FF8FA3;
+}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(20,15,40,0.95);border:1px solid rgba(255,255,255,0.15);
+  border-radius:50px;padding:0.7rem 1.5rem;font-size:0.88rem;
+  color:#fff;z-index:1000;opacity:0;transition:all .3s;pointer-events:none;
+  backdrop-filter:blur(20px);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Match popup */
+.match-popup{
+  position:fixed;inset:0;z-index:200;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);
+}
+.match-popup.show{display:flex;}
+.match-popup-inner{
+  text-align:center;padding:3rem 2rem;max-width:380px;width:90%;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{opacity:0;transform:scale(0.7);}to{opacity:1;transform:scale(1);}}
+.match-fire{font-size:4rem;margin-bottom:1rem;}
+.match-headline{
+  font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:0.5rem;
+}
+.match-sub{color:rgba(255,255,255,0.6);font-size:0.95rem;margin-bottom:2rem;}
+.match-avatars{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:2rem;}
+.match-av{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.2rem;border:3px solid rgba(255,77,109,0.4);background:rgba(255,77,109,0.1);}
+.match-heart{font-size:1.8rem;}
+.match-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.match-chat-btn{
+  padding:0.9rem 2rem;border-radius:50px;border:none;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  color:#fff;font-weight:700;font-size:0.95rem;cursor:pointer;
+  transition:opacity .2s,transform .2s;
+}
+.match-chat-btn:hover{opacity:0.9;transform:translateY(-2px);}
+.match-later-btn{
+  padding:0.9rem 1.5rem;border-radius:50px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.6);cursor:pointer;transition:all .2s;
+}
+.match-later-btn:hover{background:rgba(255,255,255,0.1);}
+
+/* Scrollbar for messages */
+.messages::-webkit-scrollbar{width:4px;}
+.messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Aura</div>
+    <div class="user-card" id="sidebarUser">
+      <div class="user-avatar" id="sidebarAvatar">🌸</div>
+      <div>
+        <div class="user-name" id="sidebarName">Loading…</div>
+        <div class="user-status">🟢 Active now</div>
+      </div>
+    </div>
+    <div class="nav-menu">
+      <button class="nav-item active" onclick="showView('discover',this)"><span class="nav-icon">🔥</span> Discover</button>
+      <button class="nav-item" onclick="showView('matches',this)"><span class="nav-icon">💞</span> Matches <span class="nav-badge" id="matchBadge">0</span></button>
+      <button class="nav-item" onclick="showView('chat',this)"><span class="nav-icon">💬</span> Messages</button>
+      <button class="nav-item" onclick="showView('profile',this)"><span class="nav-icon">👤</span> Profile</button>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="Auth.logout()">← Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DISCOVER -->
+    <div class="view active" id="view-discover">
+      <div class="discover-header">
+        <div class="view-title">Discover 🔥</div>
+        <button class="filter-btn">⚙ Filters</button>
+      </div>
+      <div class="card-stack" id="cardStack">
+        <div class="no-cards" id="noCards" style="display:none">
+          <div class="no-cards-icon">🌊</div>
+          <div class="no-cards-title">You've seen everyone!</div>
+          <div class="no-cards-sub">Check back later for new profiles, or expand your filters.</div>
+        </div>
+      </div>
+      <div class="action-btns" id="actionBtns">
+        <button class="action-btn nope" onclick="swipeCard('left')" title="Pass">✕</button>
+        <button class="action-btn super" onclick="superLike()" title="Super Like">⭐</button>
+        <button class="action-btn like" onclick="swipeCard('right')" title="Like">♥</button>
+      </div>
+    </div>
+
+    <!-- MATCHES -->
+    <div class="view" id="view-matches">
+      <div class="discover-header"><div class="view-title">Matches 💞</div></div>
+      <div class="matches-grid" id="matchesGrid">
+        <div style="color:var(--text-muted);font-size:0.9rem;grid-column:1/-1">Start swiping to get matches! 🔥</div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="view" id="view-chat">
+      <div class="chat-layout" id="chatLayout">
+        <div class="chat-list">
+          <div class="chat-list-header">💬 Messages</div>
+          <div id="chatListItems"></div>
+        </div>
+        <div class="chat-placeholder" id="chatPlaceholder">
+          <div class="chat-placeholder-icon">💌</div>
+          <div>Select a conversation to start chatting</div>
+        </div>
+        <div class="chat-window" id="chatWindow" style="display:none">
+          <div class="chat-window-header" id="chatHeader"></div>
+          <div class="messages" id="messagesBox"></div>
+          <div class="chat-input-row">
+            <input type="text" class="chat-input" id="chatInputField" placeholder="Type a message…" autocomplete="off"/>
+            <button class="send-btn" id="sendMsgBtn" onclick="sendMessage()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="view" id="view-profile">
+      <div class="discover-header"><div class="view-title">My Profile 👤</div></div>
+      <div class="profile-view">
+        <div class="profile-hero" id="profileHero"></div>
+        <div class="profile-section">
+          <div class="ps-title">My Interests</div>
+          <div class="interest-pills" id="profileInterests"></div>
+        </div>
+        <div class="profile-section">
+          <div class="ps-title">Account</div>
+          <div style="color:var(--text-muted);font-size:0.9rem;line-height:2">
+            <div id="profileEmail"></div>
+            <div id="profileJoined"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /main -->
+</div><!-- /app-shell -->
+
+<!-- Mobile nav -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mob-btn active" onclick="showView('discover',this)">🔥<span class="mob-label">Discover</span></button>
+  <button class="mob-btn" onclick="showView('matches',this)">💞<span class="mob-label">Matches</span></button>
+  <button class="mob-btn" onclick="showView('chat',this)">💬<span class="mob-label">Chat</span></button>
+  <button class="mob-btn" onclick="showView('profile',this)">👤<span class="mob-label">Me</span></button>
+</div>
+
+<!-- Match popup -->
+<div class="match-popup" id="matchPopup">
+  <div class="match-popup-inner">
+    <div class="match-fire">🎉</div>
+    <div class="match-headline">It's a Match!</div>
+    <div class="match-sub" id="matchSubText">You and someone both liked each other</div>
+    <div class="match-avatars">
+      <div class="match-av" id="myMatchAv"></div>
+      <div class="match-heart">❤️</div>
+      <div class="match-av" id="theirMatchAv"></div>
+    </div>
+    <div class="match-btns">
+      <button class="match-chat-btn" onclick="goToChat()">💬 Send a Message</button>
+      <button class="match-later-btn" onclick="closeMatchPopup()">Maybe Later</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="../js/auth.js"></script>
+<script>
+/* ── INIT ── */
+const session = Auth.requireAuth();
+if(!session) throw new Error('Not authenticated');
+
+// State
+let profiles = [];
+let currentIdx = 0;
+let dragStartX = 0, dragStartY = 0, currentX = 0;
+let isDragging = false;
+let activeMatchedUser = null;
+let activeChatUser = null;
+const chatHistories = {}; // {userId: [{role,text,time}]}
+
+// AI-style auto responses
+const autoReplies = [
+  "Haha that's so true! 😂",
+  "I totally get you!",
+  "Wow, tell me more about that 👀",
+  "We have so much in common!",
+  "That's really interesting 🌟",
+  "Okay now I'm curious 😄",
+  "Same!! I thought I was the only one",
+  "This is why we matched 😍",
+  "You seem like such a genuine person ✨",
+  "Can't believe we're this alike!",
+];
+
+function getRandReply(){ return autoReplies[Math.floor(Math.random()*autoReplies.length)]; }
+
+/* ── BOOTSTRAP ── */
+function init(){
+  // Sidebar user info
+  document.getElementById('sidebarAvatar').textContent = session.avatar || '🌸';
+  document.getElementById('sidebarName').textContent = session.name;
+
+  // Build profile cards from users (excluding self and already liked)
+  const allUsers = Auth.getUsers();
+  const myFull = Auth.getFullUser(session.id);
+  const liked = myFull?.likes || [];
+  const matches = myFull?.matches || [];
+  profiles = allUsers.filter(u =>
+    u.id !== session.id &&
+    !liked.includes(u.id)
+  );
+  // Shuffle
+  profiles = profiles.sort(()=>Math.random()-0.5);
+
+  buildCards();
+  renderMatches();
+  renderChatList();
+  renderProfile();
+  updateMatchBadge();
+}
+
+/* ── CARDS ── */
+const CARD_GRADIENTS = [
+  'linear-gradient(135deg,#2d0a4e,#1a0530)',
+  'linear-gradient(135deg,#0a1f3d,#071428)',
+  'linear-gradient(135deg,#1a0530,#0f0020)',
+  'linear-gradient(135deg,#1a2040,#0a1020)',
+  'linear-gradient(135deg,#2d1a0a,#1a0f05)',
+];
+
+function buildCards(){
+  const stack = document.getElementById('cardStack');
+  // Remove old cards (keep no-cards placeholder)
+  stack.querySelectorAll('.profile-card').forEach(c=>c.remove());
+
+  if(profiles.length === 0){
+    showNoCards(); return;
+  }
+
+  // Show up to 3 cards in stack (back to front)
+  const toShow = profiles.slice(currentIdx, currentIdx+3).reverse();
+  toShow.forEach((u, i)=>{
+    const card = makeCard(u, i === toShow.length-1);
+    stack.appendChild(card);
+  });
+}
+
+function makeCard(user, isTop){
+  const grad = CARD_GRADIENTS[Math.floor(Math.random()*CARD_GRADIENTS.length)];
+  const matchScore = 70 + Math.floor(Math.random()*25);
+  const card = document.createElement('div');
+  card.className = 'profile-card';
+  card.dataset.userId = user.id;
+  card.style.setProperty('--card-bg', grad);
+  card.style.transform = `scale(${isTop?1:0.95}) translateY(${isTop?0:12}px)`;
+  card.style.zIndex = isTop ? 10 : 5;
+
+  card.innerHTML = `
+    <div class="card-bg" style="background:${grad}">${user.avatar}</div>
+    <div class="card-like-overlay">LIKE 💚</div>
+    <div class="card-nope-overlay">NOPE ✕</div>
+    <div class="card-match-score" style="background:linear-gradient(135deg,rgba(255,77,109,0.2),rgba(199,125,255,0.2));color:#FF8FA3;border:1px solid rgba(255,77,109,0.2);">⚡ ${matchScore}%</div>
+    <div class="card-info">
+      <div class="card-name-age">${user.name}, ${user.age}</div>
+      <div class="card-location">📍 ${user.location || 'India'}</div>
+      <div class="card-bio">${user.bio || 'Just looking for a good conversation ✨'}</div>
+      <div class="card-interests">
+        ${(user.interests||[]).slice(0,4).map(i=>`<span class="card-tag">${i}</span>`).join('')}
+      </div>
+    </div>`;
+
+  if(isTop) setupDrag(card);
+  return card;
+}
+
+function setupDrag(card){
+  card.addEventListener('mousedown', onDragStart);
+  card.addEventListener('touchstart', onDragStart, {passive:true});
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('touchmove', onDragMove, {passive:true});
+  document.addEventListener('mouseup', onDragEnd);
+  document.addEventListener('touchend', onDragEnd);
+}
+
+function onDragStart(e){
+  isDragging = true;
+  dragStartX = (e.touches?.[0]?.clientX ?? e.clientX);
+  dragStartY = (e.touches?.[0]?.clientY ?? e.clientY);
+  const card = document.querySelector('.profile-card[style*="z-index: 10"], .profile-card');
+  if(card) card.classList.add('dragging');
+}
+
+function onDragMove(e){
+  if(!isDragging) return;
+  currentX = (e.touches?.[0]?.clientX ?? e.clientX) - dragStartX;
+  const card = document.querySelector('.profile-card.dragging');
+  if(!card) return;
+  const rot = currentX * 0.08;
+  card.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
+  const like = card.querySelector('.card-like-overlay');
+  const nope = card.querySelector('.card-nope-overlay');
+  if(currentX > 30){ like.style.opacity = Math.min(1, (currentX-30)/80); nope.style.opacity = 0; }
+  else if(currentX < -30){ nope.style.opacity = Math.min(1, (-currentX-30)/80); like.style.opacity = 0; }
+  else { like.style.opacity = 0; nope.style.opacity = 0; }
+}
+
+function onDragEnd(){
+  if(!isDragging) return;
+  isDragging = false;
+  const card = document.querySelector('.profile-card.dragging');
+  if(!card){ document.removeEventListener('mousemove',onDragMove); return; }
+  card.classList.remove('dragging');
+  if(currentX > 80) triggerSwipe('right', card);
+  else if(currentX < -80) triggerSwipe('left', card);
+  else { card.style.transform = 'scale(1) translateY(0)'; card.style.transition = 'transform .3s'; setTimeout(()=>card.style.transition='',300); }
+  currentX = 0;
+}
+
+function swipeCard(dir){
+  const card = document.querySelector('.profile-card');
+  if(card) triggerSwipe(dir, card);
+}
+
+function triggerSwipe(dir, card){
+  const userId = card.dataset.userId;
+  card.classList.add(dir === 'right' ? 'swipe-right' : 'swipe-left');
+  card.style.zIndex = 20;
+  setTimeout(()=>{
+    card.remove();
+    currentIdx++;
+    buildCards();
+    if(dir === 'right') handleLike(userId);
+    if(currentIdx >= profiles.length) showNoCards();
+  }, 400);
+}
+
+function handleLike(userId){
+  const myFull = Auth.getFullUser(session.id);
+  const them = Auth.getFullUser(userId);
+  if(!myFull || !them) return;
+
+  // Add to my likes
+  const myLikes = myFull.likes || [];
+  myLikes.push(userId);
+  Auth.updateProfile({likes: myLikes});
+
+  // Check if they "liked" me (50% chance for demo)
+  const theyLikeMe = Math.random() > 0.4;
+  if(theyLikeMe){
+    // It's a match!
+    const myMatches = myFull.matches || [];
+    myMatches.push(userId);
+    Auth.updateProfile({matches: myMatches});
+    activeMatchedUser = them;
+    setTimeout(()=>showMatchPopup(them), 600);
+    renderMatches();
+    updateMatchBadge();
+  }
+}
+
+function superLike(){
+  showToast('⭐ Super Liked!');
+  swipeCard('right');
+}
+
+function showNoCards(){
+  document.getElementById('noCards').style.display = 'block';
+  document.getElementById('actionBtns').style.opacity = '0.3';
+  document.getElementById('actionBtns').style.pointerEvents = 'none';
+}
+
+/* ── MATCH POPUP ── */
+function showMatchPopup(them){
+  document.getElementById('myMatchAv').textContent = session.avatar || '🌸';
+  document.getElementById('theirMatchAv').textContent = them.avatar;
+  document.getElementById('matchSubText').textContent = `You and ${them.name.split(' ')[0]} liked each other!`;
+  document.getElementById('matchPopup').classList.add('show');
+}
+function closeMatchPopup(){ document.getElementById('matchPopup').classList.remove('show'); }
+function goToChat(){
+  closeMatchPopup();
+  showView('chat');
+  if(activeMatchedUser) openChat(activeMatchedUser);
+}
+
+/* ── MATCHES ── */
+function renderMatches(){
+  const myFull = Auth.getFullUser(session.id);
+  const matchIds = myFull?.matches || [];
+  const grid = document.getElementById('matchesGrid');
+  if(matchIds.length === 0){
+    grid.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;grid-column:1/-1">Start swiping to get matches! 🔥</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  matchIds.forEach(id=>{
+    const u = Auth.getFullUser(id);
+    if(!u) return;
+    const matchScore = 70 + Math.floor(Math.random()*25);
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    card.innerHTML = `
+      <div class="match-avatar">${u.avatar}</div>
+      <div class="match-name">${u.name}</div>
+      <div class="match-meta">${u.age} · ${u.location||'India'}</div>
+      <div class="match-score">⚡ ${matchScore}% Match</div>
+      <button class="chat-btn" onclick="showView('chat');openChat(Auth.getFullUser('${u.id}'))">💬 Message</button>`;
+    grid.appendChild(card);
+  });
+}
+
+function updateMatchBadge(){
+  const myFull = Auth.getFullUser(session.id);
+  const count = myFull?.matches?.length || 0;
+  document.getElementById('matchBadge').textContent = count;
+}
+
+/* ── CHAT ── */
+function renderChatList(){
+  const myFull = Auth.getFullUser(session.id);
+  const matchIds = myFull?.matches || [];
+  const container = document.getElementById('chatListItems');
+  container.innerHTML = '';
+  if(matchIds.length === 0){
+    container.innerHTML = '<div style="padding:1rem 1.5rem;color:var(--text-muted);font-size:0.85rem">No matches yet</div>';
+    return;
+  }
+  matchIds.forEach(id=>{
+    const u = Auth.getFullUser(id);
+    if(!u) return;
+    const history = chatHistories[id] || [];
+    const last = history[history.length-1]?.text || 'Say hello! 👋';
+    const item = document.createElement('div');
+    item.className = 'chat-item';
+    item.id = 'chatItem_'+id;
+    item.innerHTML = `
+      <div class="chat-item-avatar">${u.avatar}</div>
+      <div style="flex:1;min-width:0">
+        <div class="chat-item-name">${u.name}</div>
+        <div class="chat-item-preview">${last}</div>
+      </div>
+      <div class="online-dot"></div>`;
+    item.addEventListener('click',()=>openChat(u));
+    container.appendChild(item);
+  });
+}
+
+function openChat(user){
+  activeChatUser = user;
+  document.getElementById('chatPlaceholder').style.display = 'none';
+  const win = document.getElementById('chatWindow');
+  win.style.display = 'flex';
+
+  // Header
+  document.getElementById('chatHeader').innerHTML = `
+    <div class="chat-window-avatar">${user.avatar}</div>
+    <div>
+      <div class="chat-window-name">${user.name}</div>
+      <div class="chat-window-status">🟢 Online</div>
+    </div>`;
+
+  // Highlight active chat item
+  document.querySelectorAll('.chat-item').forEach(el=>el.classList.remove('active'));
+  const activeItem = document.getElementById('chatItem_'+user.id);
+  if(activeItem) activeItem.classList.add('active');
+
+  renderMessages(user.id);
+  document.getElementById('chatInputField').focus();
+}
+
+function renderMessages(userId){
+  const box = document.getElementById('messagesBox');
+  const history = chatHistories[userId] || [];
+  box.innerHTML = '';
+
+  if(history.length === 0){
+    box.innerHTML = `<div style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin:auto">
+      You matched! Send a message to start the conversation 💌</div>`;
+    return;
+  }
+  history.forEach(msg=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-wrap ' + msg.role;
+    wrap.innerHTML = `<div class="msg ${msg.role}">${msg.text}</div><div class="msg-time">${msg.time}</div>`;
+    box.appendChild(wrap);
+  });
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendMessage(){
+  const input = document.getElementById('chatInputField');
+  const text = input.value.trim();
+  if(!text || !activeChatUser) return;
+
+  const userId = activeChatUser.id;
+  if(!chatHistories[userId]) chatHistories[userId] = [];
+
+  const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  chatHistories[userId].push({role:'me', text, time: now});
+  input.value = '';
+  renderMessages(userId);
+  renderChatList();
+
+  // Auto reply
+  setTimeout(()=>{
+    const reply = getRandReply();
+    chatHistories[userId].push({role:'them', text:reply, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+    renderMessages(userId);
+    renderChatList();
+  }, 800 + Math.random()*1200);
+}
+
+// Send on Enter
+document.getElementById('chatInputField').addEventListener('keydown',e=>{
+  if(e.key==='Enter') sendMessage();
+});
+
+/* ── PROFILE ── */
+function renderProfile(){
+  const myFull = Auth.getFullUser(session.id) || session;
+  document.getElementById('profileHero').innerHTML = `
+    <div class="profile-big-avatar">${myFull.avatar || '🌸'}</div>
+    <div>
+      <div class="profile-name">${myFull.name}</div>
+      <div class="profile-meta">${myFull.age} years · ${myFull.location || 'India'} · ${myFull.gender || ''}</div>
+      <div class="profile-bio">${myFull.bio || 'No bio yet — add one to attract better matches!'}</div>
+      <button class="edit-profile-btn" onclick="showToast('Profile editing coming soon! ✨')">✏️ Edit Profile</button>
+    </div>`;
+  const pills = document.getElementById('profileInterests');
+  pills.innerHTML = (myFull.interests||[]).map(i=>`<span class="i-pill">${i}</span>`).join('') || '<span style="color:var(--text-muted);font-size:0.88rem">No interests added yet</span>';
+  document.getElementById('profileEmail').innerHTML = `📧 ${myFull.email}`;
+  document.getElementById('profileJoined').innerHTML = `📅 Joined ${new Date(myFull.createdAt).toLocaleDateString('en-IN',{month:'long',year:'numeric'})}`;
+}
+
+/* ── VIEWS ── */
+function showView(viewName, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+viewName).classList.add('active');
+  document.querySelectorAll('.nav-item,.mob-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(viewName === 'matches') renderMatches();
+  if(viewName === 'chat') renderChatList();
+  if(viewName === 'profile') renderProfile();
+}
+
+/* ── TOAST ── */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// Start
+init();
+</script>
+</body>
+</html>

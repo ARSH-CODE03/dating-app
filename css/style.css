@@ -1,0 +1,42 @@
+/* ── GLOBAL STYLES ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --rose:#FF4D6D;
+  --rose-light:#FF8FA3;
+  --rose-dark:#C9184A;
+  --purple:#C77DFF;
+  --purple-dark:#7B2FBE;
+  --gold:#FF9E00;
+  --bg:#080512;
+  --bg2:#0F0A1E;
+  --surface:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.08);
+  --text:#fff;
+  --text-muted:rgba(255,255,255,0.45);
+  --text-dim:rgba(255,255,255,0.25);
+  --radius:16px;
+  --radius-lg:24px;
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;}
+input,textarea,select{font-family:'DM Sans',sans-serif;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:rgba(255,77,109,0.3);border-radius:3px;}
+
+/* Selection */
+::selection{background:rgba(255,77,109,0.3);}

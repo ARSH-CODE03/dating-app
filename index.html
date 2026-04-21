@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aura — Find Your Frequency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+<style>
+/* LANDING PAGE SPECIFIC */
+.landing-hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  padding:2rem;
+}
+
+/* Animated gradient orbs */
+.orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(80px);
+  opacity:0.35;
+  animation:drift 8s ease-in-out infinite;
+  pointer-events:none;
+}
+.orb-1{width:600px;height:600px;background:radial-gradient(circle,#FF4D6D,#FF8FA3);top:-10%;left:-15%;animation-delay:0s;}
+.orb-2{width:500px;height:500px;background:radial-gradient(circle,#C77DFF,#7B2FBE);bottom:-10%;right:-10%;animation-delay:-3s;}
+.orb-3{width:350px;height:350px;background:radial-gradient(circle,#FF9E00,#FF4D6D);top:40%;left:60%;animation-delay:-5s;}
+
+@keyframes drift{
+  0%,100%{transform:translate(0,0) scale(1);}
+  33%{transform:translate(30px,-20px) scale(1.05);}
+  66%{transform:translate(-20px,30px) scale(0.97);}
+}
+
+/* Grain overlay */
+.grain{
+  position:fixed;inset:0;pointer-events:none;z-index:999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.4;
+}
+
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.5rem 3rem;
+  background:rgba(8,5,18,0.6);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.6rem;font-weight:900;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.02em;
+}
+.nav-links{display:flex;gap:1.5rem;align-items:center;}
+.nav-link{
+  color:rgba(255,255,255,0.6);font-size:0.9rem;
+  text-decoration:none;transition:color .2s;font-family:'DM Sans',sans-serif;
+}
+.nav-link:hover{color:#fff;}
+.nav-cta{
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  color:#fff!important;padding:0.55rem 1.4rem;border-radius:50px;
+  font-weight:600;font-size:0.88rem;transition:opacity .2s,transform .2s;
+}
+.nav-cta:hover{opacity:0.9;transform:translateY(-1px);}
+
+.hero-content{
+  text-align:center;position:relative;z-index:2;
+  max-width:760px;
+  animation:fadeUp 1s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+.hero-tag{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,77,109,0.3);
+  padding:0.4rem 1rem;border-radius:50px;margin-bottom:2rem;
+  font-size:0.8rem;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;
+  letter-spacing:0.05em;text-transform:uppercase;
+}
+.hero-tag span{width:6px;height:6px;background:#FF4D6D;border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,8vw,6rem);
+  font-weight:900;line-height:1.0;
+  color:#fff;letter-spacing:-0.03em;
+  margin-bottom:1.5rem;
+}
+.hero-title em{
+  font-style:italic;
+  background:linear-gradient(135deg,#FF4D6D 0%,#FF8FA3 40%,#C77DFF 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+.hero-sub{
+  font-family:'DM Sans',sans-serif;
+  font-size:1.15rem;color:rgba(255,255,255,0.55);
+  max-width:520px;margin:0 auto 2.5rem;line-height:1.7;font-weight:300;
+}
+
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn-primary{
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  color:#fff;padding:0.9rem 2.4rem;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:1rem;
+  text-decoration:none;transition:transform .2s,box-shadow .2s;
+  box-shadow:0 8px 30px rgba(255,77,109,0.35);
+}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,77,109,0.5);}
+.btn-ghost{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);
+  color:#fff;padding:0.9rem 2.4rem;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-weight:500;font-size:1rem;
+  text-decoration:none;transition:background .2s,transform .2s;
+  backdrop-filter:blur(10px);
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px);}
+
+/* Floating cards */
+.float-cards{
+  display:flex;gap:1.5rem;justify-content:center;
+  margin-top:5rem;position:relative;z-index:2;
+  animation:fadeUp 1s ease 0.3s both;
+  flex-wrap:wrap;
+}
+.profile-card{
+  width:190px;background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:24px;padding:1.5rem 1.2rem;text-align:center;
+  backdrop-filter:blur(20px);
+  transition:transform .3s;cursor:pointer;
+}
+.profile-card:nth-child(2){transform:translateY(-20px);}
+.profile-card:hover{transform:translateY(-8px)!important;}
+.profile-card:nth-child(2):hover{transform:translateY(-28px)!important;}
+
+.card-avatar{
+  width:70px;height:70px;border-radius:50%;
+  margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;
+  font-size:2rem;border:2px solid rgba(255,255,255,0.1);
+}
+.card-name{font-family:'DM Sans',sans-serif;font-weight:600;color:#fff;font-size:0.95rem;}
+.card-meta{font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:0.3rem;}
+.card-tags{display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center;margin-top:0.8rem;}
+.tag{
+  background:rgba(255,77,109,0.15);border:1px solid rgba(255,77,109,0.2);
+  color:#FF8FA3;font-size:0.7rem;padding:0.2rem 0.5rem;border-radius:50px;
+  font-family:'DM Sans',sans-serif;
+}
+.card-match{
+  margin-top:1rem;font-size:0.8rem;font-weight:600;
+  background:linear-gradient(90deg,#FF4D6D,#C77DFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+/* Features section */
+.features{
+  padding:6rem 2rem;max-width:1100px;margin:0 auto;
+}
+.section-label{
+  text-align:center;font-family:'DM Sans',sans-serif;
+  font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:rgba(255,255,255,0.35);margin-bottom:1rem;
+}
+.section-title{
+  text-align:center;font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,3rem);font-weight:700;color:#fff;
+  margin-bottom:3.5rem;line-height:1.2;
+}
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;
+}
+.feature-card{
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:2rem;
+  transition:border-color .3s,transform .3s;
+}
+.feature-card:hover{border-color:rgba(255,77,109,0.4);transform:translateY(-4px);}
+.feature-icon{
+  width:50px;height:50px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:1.2rem;
+}
+.feature-title{font-family:'DM Sans',sans-serif;font-weight:600;color:#fff;margin-bottom:0.5rem;}
+.feature-desc{font-family:'DM Sans',sans-serif;font-size:0.88rem;color:rgba(255,255,255,0.45);line-height:1.6;}
+
+/* Stats */
+.stats{
+  padding:4rem 2rem;
+  display:flex;justify-content:center;gap:4rem;flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,0.06);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  margin:0 2rem;
+}
+.stat-item{text-align:center;}
+.stat-num{
+  font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-label{font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.4);margin-top:0.3rem;}
+
+/* CTA Section */
+.cta-section{
+  text-align:center;padding:7rem 2rem;
+}
+.cta-section .hero-title{font-size:clamp(2.5rem,5vw,4rem);}
+
+footer{
+  text-align:center;padding:2rem;
+  font-family:'DM Sans',sans-serif;font-size:0.82rem;
+  color:rgba(255,255,255,0.2);
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">Aura</div>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#about" class="nav-link">About</a>
+    <a href="pages/login.html" class="nav-link">Sign In</a>
+    <a href="pages/register.html" class="nav-link nav-cta">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="landing-hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag"><span></span>Now Live — Version 2.0</div>
+    <h1 class="hero-title">Love at the<br/><em>right frequency</em></h1>
+    <p class="hero-sub">Aura matches you with people who vibe on your wavelength. Not just looks — personality, energy, and real connection.</p>
+    <div class="hero-btns">
+      <a href="pages/register.html" class="btn-primary">✨ Create Your Aura</a>
+      <a href="pages/login.html" class="btn-ghost">Sign In</a>
+    </div>
+  </div>
+
+  <div class="float-cards">
+    <div class="profile-card">
+      <div class="card-avatar" style="background:linear-gradient(135deg,#FF4D6D22,#FF8FA333)">🌸</div>
+      <div class="card-name">Priya S.</div>
+      <div class="card-meta">24 · Mumbai</div>
+      <div class="card-tags"><span class="tag">Art</span><span class="tag">Travel</span></div>
+      <div class="card-match">⚡ 94% Match</div>
+    </div>
+    <div class="profile-card">
+      <div class="card-avatar" style="background:linear-gradient(135deg,#C77DFF22,#7B2FBE33)">🎵</div>
+      <div class="card-name">Arjun K.</div>
+      <div class="card-meta">26 · Delhi</div>
+      <div class="card-tags"><span class="tag">Music</span><span class="tag">Coffee</span></div>
+      <div class="card-match">⚡ 89% Match</div>
+    </div>
+    <div class="profile-card">
+      <div class="card-avatar" style="background:linear-gradient(135deg,#FF9E0022,#FF4D6D33)">📚</div>
+      <div class="card-name">Neha R.</div>
+      <div class="card-meta">23 · Bangalore</div>
+      <div class="card-tags"><span class="tag">Books</span><span class="tag">Yoga</span></div>
+      <div class="card-match">⚡ 91% Match</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats" id="about">
+  <div class="stat-item"><div class="stat-num">2M+</div><div class="stat-label">Active Users</div></div>
+  <div class="stat-item"><div class="stat-num">94%</div><div class="stat-label">Match Accuracy</div></div>
+  <div class="stat-item"><div class="stat-num">180K</div><div class="stat-label">Couples Formed</div></div>
+  <div class="stat-item"><div class="stat-num">50+</div><div class="stat-label">Cities</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">Why Aura</div>
+  <h2 class="section-title">Built different,<br/>for real connections</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,77,109,0.12)">⚡</div>
+      <div class="feature-title">Frequency Matching™</div>
+      <div class="feature-desc">Our AI analyses personality, interests, and communication style to find people who truly resonate with you.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(199,125,255,0.12)">🛡️</div>
+      <div class="feature-title">Verified Profiles</div>
+      <div class="feature-desc">Every profile is photo-verified. No catfishing. No bots. Just real humans looking for real connections.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,158,0,0.12)">💬</div>
+      <div class="feature-title">Icebreaker AI</div>
+      <div class="feature-desc">Never stare at a blank message box again. Our AI suggests personalised openers based on their profile.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(0,200,150,0.12)">🗺️</div>
+      <div class="feature-title">Proximity Mode</div>
+      <div class="feature-desc">Find matches at your college fest, coffee shop, or neighbourhood. Love is closer than you think.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,77,109,0.12)">🔒</div>
+      <div class="feature-title">Private by Default</div>
+      <div class="feature-desc">You control who sees what. Blur your photos, hide your location, go invisible. Your privacy, your rules.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(199,125,255,0.12)">🌈</div>
+      <div class="feature-title">Inclusive Always</div>
+      <div class="feature-desc">All orientations, all backgrounds, all identities welcomed. Aura is a space for everyone to find love.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="orb orb-2" style="opacity:0.2;bottom:0;right:20%;top:auto;"></div>
+  <div class="section-label">Ready?</div>
+  <h2 class="hero-title">Your person is<br/><em>already here</em></h2>
+  <p class="hero-sub" style="margin:1.5rem auto 2.5rem">Join 2 million people who stopped swiping blindly and started connecting meaningfully.</p>
+  <div class="hero-btns">
+    <a href="pages/register.html" class="btn-primary">✨ Start for Free</a>
+  </div>
+</section>
+
+<footer>© 2025 Aura Dating Inc. — Made with ❤️ for real connections.</footer>
+
+<script>
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>

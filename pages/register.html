@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Create Account — Aura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>
+.auth-wrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+@media(max-width:768px){.auth-wrap{grid-template-columns:1fr;}.auth-visual{display:none;}}
+
+.auth-visual{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#030d1a,#071428,#0a1f3d);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;
+}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.4;pointer-events:none;}
+.orb-a{width:400px;height:400px;background:radial-gradient(#0070F3,transparent);top:-100px;right:-100px;animation:sway 7s ease-in-out infinite;}
+.orb-b{width:350px;height:350px;background:radial-gradient(#FF4D6D,transparent);bottom:-80px;left:-80px;animation:sway 9s ease-in-out infinite reverse;}
+.orb-c{width:200px;height:200px;background:radial-gradient(#C77DFF,transparent);top:50%;left:50%;transform:translate(-50%,-50%);animation:sway 5s ease-in-out infinite;}
+@keyframes sway{0%,100%{transform:translate(0,0);}50%{transform:translate(15px,15px);}}
+
+.visual-logo{
+  font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;
+  background:linear-gradient(135deg,#00C6FF,#FF4D6D);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:2rem;position:relative;z-index:2;
+}
+.visual-steps{position:relative;z-index:2;width:100%;max-width:300px;}
+.vstep{
+  display:flex;align-items:center;gap:1rem;padding:1rem;
+  border-radius:14px;transition:background .3s;
+}
+.vstep.active{background:rgba(255,255,255,0.07);}
+.vstep-num{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;font-weight:700;flex-shrink:0;
+  border:2px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.3);
+  transition:all .3s;
+}
+.vstep.active .vstep-num,.vstep.done .vstep-num{
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  border-color:transparent;color:#fff;
+}
+.vstep-label{font-family:'DM Sans',sans-serif;font-size:0.9rem;color:rgba(255,255,255,0.35);}
+.vstep.active .vstep-label{color:#fff;font-weight:600;}
+.vstep.done .vstep-label{color:rgba(255,255,255,0.6);}
+.vstep-connector{width:2px;height:20px;background:rgba(255,255,255,0.08);margin-left:17px;}
+
+.auth-form-panel{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:3rem 4rem;background:var(--bg2);overflow-y:auto;
+}
+@media(max-width:900px){.auth-form-panel{padding:2rem;}}
+
+/* Progress bar */
+.progress-bar{
+  height:3px;background:rgba(255,255,255,0.08);border-radius:2px;
+  margin-bottom:2.5rem;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,#FF4D6D,#C77DFF);
+  border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1);
+}
+
+.form-header{margin-bottom:2rem;}
+.step-label{
+  font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;
+  color:rgba(255,77,109,0.7);font-weight:600;margin-bottom:0.5rem;
+}
+.form-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:#fff;line-height:1.1;}
+.form-sub{margin-top:0.5rem;font-size:0.88rem;color:var(--text-muted);}
+.form-sub a{color:#FF8FA3;font-weight:500;}
+
+/* Steps */
+.step{display:none;}
+.step.active{display:block;animation:stepIn .35s ease;}
+@keyframes stepIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+
+.form-group{margin-bottom:1.2rem;}
+.form-label{display:block;font-size:0.82rem;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:0.5rem;}
+.form-input,.form-select{
+  width:100%;padding:0.9rem 1.1rem;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;color:#fff;font-size:0.95rem;
+  transition:border-color .2s,background .2s;outline:none;
+  -webkit-appearance:none;appearance:none;
+}
+.form-input:focus,.form-select:focus{border-color:#FF4D6D;background:rgba(255,77,109,0.05);}
+.form-input::placeholder{color:rgba(255,255,255,0.2);}
+.form-select option{background:#1a1030;color:#fff;}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+
+.input-wrap{position:relative;}
+.eye-btn{
+  position:absolute;right:1rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(255,255,255,0.3);
+  font-size:1rem;cursor:pointer;transition:color .2s;
+}
+.eye-btn:hover{color:#FF8FA3;}
+
+/* Password strength */
+.pw-strength{margin-top:0.5rem;}
+.pw-bars{display:flex;gap:4px;margin-bottom:0.3rem;}
+.pw-bar{height:3px;flex:1;border-radius:2px;background:rgba(255,255,255,0.1);transition:background .3s;}
+.pw-text{font-size:0.75rem;color:var(--text-dim);}
+
+/* Interest chips */
+.chips-wrap{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;}
+.chip{
+  padding:0.45rem 1rem;border-radius:50px;font-size:0.85rem;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.6);cursor:pointer;transition:all .2s;user-select:none;
+}
+.chip:hover{border-color:rgba(255,77,109,0.4);color:#fff;}
+.chip.selected{
+  background:rgba(255,77,109,0.15);border-color:rgba(255,77,109,0.5);
+  color:#FF8FA3;font-weight:600;
+}
+
+/* Gender cards */
+.gender-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-top:0.5rem;}
+.gender-card{
+  padding:1.2rem 0.8rem;border-radius:14px;text-align:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);
+  transition:all .2s;
+}
+.gender-card:hover{border-color:rgba(255,77,109,0.3);}
+.gender-card.selected{
+  background:rgba(255,77,109,0.1);border-color:rgba(255,77,109,0.5);
+}
+.gender-icon{font-size:1.8rem;margin-bottom:0.4rem;}
+.gender-label{font-size:0.8rem;color:rgba(255,255,255,0.6);}
+.gender-card.selected .gender-label{color:#FF8FA3;font-weight:600;}
+
+/* Terms */
+.terms-check{
+  display:flex;align-items:flex-start;gap:0.7rem;margin-top:0.5rem;
+  font-size:0.83rem;color:var(--text-muted);
+}
+.terms-check input{accent-color:#FF4D6D;width:16px;height:16px;flex-shrink:0;margin-top:2px;}
+.terms-check a{color:#FF8FA3;}
+
+/* Buttons */
+.btn-row{display:flex;gap:1rem;margin-top:1.8rem;}
+.btn-back{
+  flex:0;padding:1rem 1.5rem;border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;background:transparent;color:rgba(255,255,255,0.5);
+  font-size:0.95rem;transition:all .2s;white-space:nowrap;
+}
+.btn-back:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.btn-next,.btn-submit{
+  flex:1;padding:1rem;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  color:#fff;font-size:1rem;font-weight:700;
+  transition:opacity .2s,transform .2s;
+  box-shadow:0 6px 25px rgba(255,77,109,0.3);
+}
+.btn-next:hover,.btn-submit:hover{opacity:0.92;transform:translateY(-2px);}
+
+.alert{
+  padding:0.85rem 1.1rem;border-radius:10px;
+  font-size:0.88rem;margin-bottom:1.2rem;display:none;
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.alert-error{background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.3);color:#FF8FA3;}
+.alert-success{background:rgba(0,200,150,0.12);border:1px solid rgba(0,200,150,0.3);color:#00C896;}
+
+.back-home{
+  position:fixed;top:1.5rem;left:1.5rem;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:50px;padding:0.5rem 1.1rem;font-size:0.85rem;
+  color:rgba(255,255,255,0.6);transition:all .2s;z-index:10;
+}
+.back-home:hover{background:rgba(255,255,255,0.1);color:#fff;}
+
+.spinner{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back-home">← Home</a>
+
+<div class="auth-wrap">
+  <!-- Visual Panel -->
+  <div class="auth-visual">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+    <div class="visual-logo">Aura</div>
+    <div class="visual-steps">
+      <div class="vstep active" data-step="1">
+        <div class="vstep-num">1</div>
+        <div class="vstep-label">Your Basics</div>
+      </div>
+      <div class="vstep-connector"></div>
+      <div class="vstep" data-step="2">
+        <div class="vstep-num">2</div>
+        <div class="vstep-label">Identity & Preferences</div>
+      </div>
+      <div class="vstep-connector"></div>
+      <div class="vstep" data-step="3">
+        <div class="vstep-num">3</div>
+        <div class="vstep-label">Your Interests</div>
+      </div>
+      <div class="vstep-connector"></div>
+      <div class="vstep" data-step="4">
+        <div class="vstep-num">4</div>
+        <div class="vstep-label">Almost There!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Panel -->
+  <div class="auth-form-panel">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+
+    <div class="alert alert-error" id="errorMsg"></div>
+
+    <!-- STEP 1: Basics -->
+    <div class="step active" id="step1">
+      <div class="form-header">
+        <div class="step-label">Step 1 of 4</div>
+        <div class="form-title">Nice to meet you 👋</div>
+        <div class="form-sub">Already have an account? <a href="login.html">Sign in →</a></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" id="firstName" class="form-input" placeholder="Priya"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" id="lastName" class="form-input" placeholder="Sharma"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="regEmail" class="form-input" placeholder="priya@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="regPassword" class="form-input" placeholder="Min. 6 characters" style="padding-right:3rem;" oninput="checkStrength(this.value)"/>
+          <button type="button" class="eye-btn" onclick="togglePw('regPassword',this)">👁</button>
+        </div>
+        <div class="pw-strength">
+          <div class="pw-bars">
+            <div class="pw-bar" id="bar1"></div>
+            <div class="pw-bar" id="bar2"></div>
+            <div class="pw-bar" id="bar3"></div>
+            <div class="pw-bar" id="bar4"></div>
+          </div>
+          <div class="pw-text" id="pwText">Enter a password</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <div class="input-wrap">
+          <input type="password" id="regConfirm" class="form-input" placeholder="Repeat password" style="padding-right:3rem;"/>
+          <button type="button" class="eye-btn" onclick="togglePw('regConfirm',this)">👁</button>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn-next" onclick="goStep(2)">Continue →</button></div>
+    </div>
+
+    <!-- STEP 2: Identity -->
+    <div class="step" id="step2">
+      <div class="form-header">
+        <div class="step-label">Step 2 of 4</div>
+        <div class="form-title">Tell us about yourself ✨</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date of Birth (must be 18+)</label>
+        <input type="date" id="dob" class="form-input"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City / Location</label>
+        <input type="text" id="location" class="form-input" placeholder="Mumbai, Delhi, Bangalore…"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">I identify as</label>
+        <div class="gender-grid">
+          <div class="gender-card" data-val="man" onclick="selectGender(this)">
+            <div class="gender-icon">👨</div>
+            <div class="gender-label">Man</div>
+          </div>
+          <div class="gender-card" data-val="woman" onclick="selectGender(this)">
+            <div class="gender-icon">👩</div>
+            <div class="gender-label">Woman</div>
+          </div>
+          <div class="gender-card" data-val="nonbinary" onclick="selectGender(this)">
+            <div class="gender-icon">🌈</div>
+            <div class="gender-label">Non-binary</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">I'm looking for</label>
+        <select id="lookingFor" class="form-select">
+          <option value="">— Select preference —</option>
+          <option value="man">Men</option>
+          <option value="woman">Women</option>
+          <option value="nonbinary">Non-binary people</option>
+          <option value="anyone">Everyone</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <button class="btn-next" onclick="goStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Interests -->
+    <div class="step" id="step3">
+      <div class="form-header">
+        <div class="step-label">Step 3 of 4</div>
+        <div class="form-title">What lights you up? 🔥</div>
+        <div class="form-sub">Pick at least 3 interests to help us find your match.</div>
+      </div>
+      <div class="chips-wrap" id="chipsWrap"></div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <button class="btn-next" onclick="goStep(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Final -->
+    <div class="step" id="step4">
+      <div class="form-header">
+        <div class="step-label">Step 4 of 4</div>
+        <div class="form-title">One last thing 🌟</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Bio <span style="color:var(--text-dim)">(optional)</span></label>
+        <textarea id="bio" class="form-input" rows="3" placeholder="A sentence or two about you — hobbies, vibe, what you're looking for…" style="resize:vertical;"></textarea>
+      </div>
+      <div class="terms-check">
+        <input type="checkbox" id="terms"/>
+        <div>I agree to Aura's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I confirm I am 18 years or older.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(3)">← Back</button>
+        <button class="btn-submit" id="submitBtn" onclick="doRegister()">✨ Create My Aura</button>
+      </div>
+    </div>
+
+  </div><!-- /auth-form-panel -->
+</div>
+
+<script src="../js/auth.js"></script>
+<script>
+Auth.requireGuest();
+
+let currentStep = 1;
+let selectedGender = '';
+let selectedInterests = [];
+
+const INTERESTS = [
+  'Music','Travel','Photography','Art','Reading','Cooking','Gaming','Fitness',
+  'Yoga','Dancing','Movies','Hiking','Cycling','Coffee','Tea','Astronomy',
+  'Poetry','Philosophy','Fashion','Foodie','Sports','Coding','Design','Meditation',
+  'Dogs','Cats','Netflix','Theatre','Stand-up Comedy','Journaling'
+];
+
+// Build chips
+const wrap = document.getElementById('chipsWrap');
+INTERESTS.forEach(i=>{
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.textContent = i;
+  chip.addEventListener('click',()=>{
+    chip.classList.toggle('selected');
+    if(chip.classList.contains('selected')) selectedInterests.push(i);
+    else selectedInterests = selectedInterests.filter(x=>x!==i);
+  });
+  wrap.appendChild(chip);
+});
+
+function goStep(n){
+  hideError();
+  if(n > currentStep && !validateStep(currentStep)) return;
+  document.getElementById('step'+currentStep).classList.remove('active');
+  document.querySelectorAll('.vstep').forEach((el,i)=>{
+    el.classList.remove('active','done');
+    if(i+1 < n) el.classList.add('done');
+    if(i+1 === n) el.classList.add('active');
+  });
+  currentStep = n;
+  document.getElementById('step'+n).classList.add('active');
+  document.getElementById('progressFill').style.width = (n/4*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function validateStep(s){
+  if(s===1){
+    const fn = document.getElementById('firstName').value.trim();
+    const ln = document.getElementById('lastName').value.trim();
+    const em = document.getElementById('regEmail').value.trim();
+    const pw = document.getElementById('regPassword').value;
+    const cf = document.getElementById('regConfirm').value;
+    if(!fn||!ln) return showError('Please enter your full name.');
+    if(!em||!/\S+@\S+\.\S+/.test(em)) return showError('Please enter a valid email address.');
+    if(pw.length < 6) return showError('Password must be at least 6 characters.');
+    if(pw !== cf) return showError('Passwords do not match.');
+    return true;
+  }
+  if(s===2){
+    if(!document.getElementById('dob').value) return showError('Please enter your date of birth.');
+    if(!selectedGender) return showError('Please select how you identify.');
+    if(!document.getElementById('lookingFor').value) return showError('Please select your preference.');
+    const age = Auth.calcAge(document.getElementById('dob').value);
+    if(age < 18) return showError('You must be 18 or older to join Aura.');
+    return true;
+  }
+  if(s===3){
+    if(selectedInterests.length < 3) return showError('Pick at least 3 interests.');
+    return true;
+  }
+  return true;
+}
+
+function showError(msg){ const el=document.getElementById('errorMsg'); el.textContent='⚠ '+msg; el.style.display='block'; return false; }
+function hideError(){ document.getElementById('errorMsg').style.display='none'; }
+function togglePw(id,btn){ const i=document.getElementById(id); i.type=i.type==='text'?'password':'text'; btn.textContent=i.type==='password'?'👁':'🙈'; }
+
+function selectGender(card){
+  document.querySelectorAll('.gender-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedGender = card.dataset.val;
+}
+
+function checkStrength(pw){
+  let score = 0;
+  if(pw.length >= 6) score++;
+  if(pw.length >= 10) score++;
+  if(/[A-Z]/.test(pw)&&/[a-z]/.test(pw)) score++;
+  if(/[0-9!@#$%^&*]/.test(pw)) score++;
+  const bars = ['bar1','bar2','bar3','bar4'];
+  const cols = ['','#FF6B6B','#FF9E00','#FFD93D','#00C896'];
+  const labels = ['','Weak','Fair','Good','Strong 💪'];
+  bars.forEach((id,i)=>{
+    document.getElementById(id).style.background = i < score ? cols[score] : 'rgba(255,255,255,0.1)';
+  });
+  document.getElementById('pwText').textContent = pw.length ? labels[score] : 'Enter a password';
+  document.getElementById('pwText').style.color = cols[score] || 'rgba(255,255,255,0.3)';
+}
+
+function doRegister(){
+  if(!validateStep(4)) return;
+  if(!document.getElementById('terms').checked){ showError('Please accept the Terms of Service.'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Creating your Aura…';
+  setTimeout(()=>{
+    const result = Auth.register({
+      name: document.getElementById('firstName').value.trim()+' '+document.getElementById('lastName').value.trim(),
+      email: document.getElementById('regEmail').value.trim(),
+      password: document.getElementById('regPassword').value,
+      dob: document.getElementById('dob').value,
+      gender: selectedGender,
+      lookingFor: document.getElementById('lookingFor').value,
+    });
+    if(result.ok){
+      Auth.updateProfile({
+        bio: document.getElementById('bio').value.trim(),
+        interests: selectedInterests,
+        location: document.getElementById('location').value.trim(),
+      });
+      btn.innerHTML = '✓ Welcome to Aura!';
+      btn.style.background = 'linear-gradient(135deg,#00C896,#0070F3)';
+      setTimeout(()=>{ window.location.href = 'app.html'; }, 900);
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '✨ Create My Aura';
+      showError(result.error);
+    }
+  }, 800);
+}
+</script>
+</body>
+</html>

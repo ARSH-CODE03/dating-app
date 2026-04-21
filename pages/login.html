@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign In — Aura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/style.css"/>
+<style>
+.auth-wrap{
+  min-height:100vh;display:grid;
+  grid-template-columns:1fr 1fr;
+}
+@media(max-width:768px){.auth-wrap{grid-template-columns:1fr;}.auth-visual{display:none;}}
+
+/* LEFT visual panel */
+.auth-visual{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#1a0530,#2d0a4e,#0f0020);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;
+}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.4;pointer-events:none;}
+.orb-a{width:400px;height:400px;background:radial-gradient(#FF4D6D,transparent);top:-100px;left:-100px;animation:sway 7s ease-in-out infinite;}
+.orb-b{width:300px;height:300px;background:radial-gradient(#C77DFF,transparent);bottom:-80px;right:-80px;animation:sway 9s ease-in-out infinite reverse;}
+@keyframes sway{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,20px);}}
+
+.visual-logo{
+  font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:2rem;position:relative;z-index:2;
+}
+.visual-quote{
+  position:relative;z-index:2;text-align:center;
+  font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;
+  color:#fff;line-height:1.3;max-width:360px;
+}
+.visual-quote em{font-style:italic;color:#FF8FA3;}
+.visual-sub{
+  position:relative;z-index:2;margin-top:1.2rem;
+  font-family:'DM Sans',sans-serif;font-size:0.9rem;
+  color:rgba(255,255,255,0.4);text-align:center;
+}
+
+/* RIGHT form panel */
+.auth-form-panel{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:3rem 4rem;background:var(--bg2);
+}
+@media(max-width:900px){.auth-form-panel{padding:2rem;}}
+
+.form-header{margin-bottom:2.5rem;}
+.form-title{
+  font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;
+  color:#fff;line-height:1.1;
+}
+.form-sub{margin-top:0.6rem;font-size:0.9rem;color:var(--text-muted);}
+.form-sub a{color:#FF8FA3;font-weight:500;}
+.form-sub a:hover{color:#FF4D6D;}
+
+.form-group{margin-bottom:1.3rem;}
+.form-label{
+  display:block;font-size:0.82rem;font-weight:500;
+  color:rgba(255,255,255,0.6);margin-bottom:0.5rem;letter-spacing:0.02em;
+}
+.form-input{
+  width:100%;padding:0.9rem 1.1rem;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;color:#fff;font-size:0.95rem;
+  transition:border-color .2s,background .2s;outline:none;
+}
+.form-input:focus{
+  border-color:#FF4D6D;
+  background:rgba(255,77,109,0.06);
+}
+.form-input::placeholder{color:rgba(255,255,255,0.2);}
+
+.input-wrap{position:relative;}
+.eye-btn{
+  position:absolute;right:1rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(255,255,255,0.3);
+  font-size:1rem;cursor:pointer;transition:color .2s;padding:0.2rem;
+}
+.eye-btn:hover{color:#FF8FA3;}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+
+.remember-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.checkbox-label{display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--text-muted);cursor:pointer;}
+.checkbox-label input{accent-color:#FF4D6D;width:16px;height:16px;}
+.forgot-link{font-size:0.85rem;color:#FF8FA3;transition:color .2s;}
+.forgot-link:hover{color:#FF4D6D;}
+
+.btn-submit{
+  width:100%;padding:1rem;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#FF4D6D,#C77DFF);
+  color:#fff;font-size:1rem;font-weight:700;
+  transition:opacity .2s,transform .2s;
+  box-shadow:0 6px 25px rgba(255,77,109,0.3);
+  letter-spacing:0.01em;
+}
+.btn-submit:hover{opacity:0.92;transform:translateY(-2px);}
+.btn-submit:active{transform:translateY(0);}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+.divider{
+  display:flex;align-items:center;gap:1rem;margin:1.5rem 0;
+  color:var(--text-dim);font-size:0.82rem;
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;background:rgba(255,255,255,0.08);
+}
+
+.demo-btn{
+  width:100%;padding:0.85rem;border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;background:rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.7);font-size:0.9rem;
+  transition:background .2s,border-color .2s;
+}
+.demo-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);}
+
+/* Error / Success */
+.alert{
+  padding:0.85rem 1.1rem;border-radius:10px;
+  font-size:0.88rem;margin-bottom:1.2rem;display:none;
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.alert-error{background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.3);color:#FF8FA3;}
+.alert-success{background:rgba(0,200,150,0.12);border:1px solid rgba(0,200,150,0.3);color:#00C896;}
+
+.back-home{
+  position:fixed;top:1.5rem;left:1.5rem;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:50px;padding:0.5rem 1.1rem;font-size:0.85rem;
+  color:rgba(255,255,255,0.6);transition:all .2s;z-index:10;
+}
+.back-home:hover{background:rgba(255,255,255,0.1);color:#fff;}
+
+/* Loading spinner */
+.spinner{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<a href="../index.html" class="back-home">← Home</a>
+
+<div class="auth-wrap">
+  <!-- Visual Panel -->
+  <div class="auth-visual">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="visual-logo">Aura</div>
+    <div class="visual-quote">
+      Welcome back,<br/>let's find your <em>person</em> today.
+    </div>
+    <div class="visual-sub">Millions of connections waiting for you.</div>
+  </div>
+
+  <!-- Form Panel -->
+  <div class="auth-form-panel">
+    <div class="form-header">
+      <div class="form-title">Sign In</div>
+      <div class="form-sub">New here? <a href="register.html">Create an account →</a></div>
+    </div>
+
+    <div class="alert alert-error" id="errorMsg"></div>
+    <div class="alert alert-success" id="successMsg"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-input" placeholder="you@example.com" required autocomplete="email"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password" style="padding-right:3rem;"/>
+          <button type="button" class="eye-btn" id="eyeBtn" title="Show/hide password">👁</button>
+        </div>
+      </div>
+
+      <div class="remember-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember"/> Remember me
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Sign In →</button>
+    </form>
+
+    <div class="divider">or try a demo account</div>
+    <button class="demo-btn" id="demoBtn">🎭 Sign in as Demo User</button>
+  </div>
+</div>
+
+<script src="../js/auth.js"></script>
+<script>
+Auth.requireGuest();
+
+const form = document.getElementById('loginForm');
+const errorMsg = document.getElementById('errorMsg');
+const successMsg = document.getElementById('successMsg');
+const submitBtn = document.getElementById('submitBtn');
+const eyeBtn = document.getElementById('eyeBtn');
+const pwdInput = document.getElementById('password');
+
+// Restore remembered email
+const remembered = localStorage.getItem('aura_remember');
+if(remembered){
+  document.getElementById('email').value = remembered;
+  document.getElementById('remember').checked = true;
+}
+
+// Toggle password visibility
+eyeBtn.addEventListener('click', ()=>{
+  const isText = pwdInput.type === 'text';
+  pwdInput.type = isText ? 'password' : 'text';
+  eyeBtn.textContent = isText ? '👁' : '🙈';
+});
+
+function showError(msg){
+  errorMsg.textContent = '⚠ ' + msg;
+  errorMsg.style.display = 'block';
+  successMsg.style.display = 'none';
+}
+function showSuccess(msg){
+  successMsg.textContent = '✓ ' + msg;
+  successMsg.style.display = 'block';
+  errorMsg.style.display = 'none';
+}
+
+function setLoading(on){
+  submitBtn.disabled = on;
+  submitBtn.innerHTML = on ? '<span class="spinner"></span> Signing in…' : 'Sign In →';
+}
+
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const password = pwdInput.value;
+  if(!email || !password){ showError('Please fill in all fields.'); return; }
+  setLoading(true);
+  setTimeout(()=>{
+    const result = Auth.login({email, password});
+    setLoading(false);
+    if(result.ok){
+      if(document.getElementById('remember').checked){
+        localStorage.setItem('aura_remember', email);
+      } else {
+        localStorage.removeItem('aura_remember');
+      }
+      showSuccess('Welcome back, ' + result.user.name.split(' ')[0] + '! Redirecting…');
+      setTimeout(()=>{ window.location.href = 'app.html'; }, 900);
+    } else {
+      showError(result.error);
+    }
+  }, 600);
+});
+
+document.getElementById('demoBtn').addEventListener('click', ()=>{
+  document.getElementById('email').value = 'priya@demo.com';
+  pwdInput.value = 'demo';
+  form.dispatchEvent(new Event('submit'));
+});
+</script>
+</body>
+</html>
